@@ -5,6 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.File;
+import java.nio.file.Files;
 
 import util.Global;
 
@@ -13,6 +16,7 @@ public class ClientHandler implements Runnable {
 	private BufferedReader br = null;
 	private DataOutputStream dos = null;
 	private Socket socket = null;
+    private ObjectInputStream ois = null;
 	private int id = 0;//Remote port, two different clients could have the same though!
 
 	public ClientHandler(Socket socket) throws IOException {
@@ -20,6 +24,7 @@ public class ClientHandler implements Runnable {
 		this.dos = new DataOutputStream(socket.getOutputStream());
 		this.socket = socket;
 		this.id  = this.socket.getPort();//This ID might not be unique!
+      //  this.ois = new ObjectInputStream(socket.getInputStream());
 	//	this.sendWelcomeMessage();
 		System.out.println("++ #" + String.format("%05d", this.id));
 	}
@@ -33,38 +38,50 @@ public class ClientHandler implements Runnable {
 
 	@Override
 	public void run() {
+        System.out.println("BEGIN OF RUN");
 		try {
+            System.out.println("try");
 			String incomingMessage;
 			boolean quit = false;
-			do {
-				incomingMessage = br.readLine();
 
-                incomingMessage = (incomingMessage != null) ? incomingMessage.trim() : "";
+			do {
+				//incomingMessage = br.readLine();
+
+                //incomingMessage = (incomingMessage != null) ? incomingMessage.trim() : "";
+
+                //System.out.println(incomingMessage);
+                
+                //if("CREATE_FILE".equals(incomingMessage)) {
+                    try {
+                        if (ois == null) {
+                            ois = new ObjectInputStream(socket.getInputStream());
+                        }
+                        File file = (File) ois.readObject();
+                        String filePathToWrite = Global.SERVER_REPOSITORY + "/" + file.getName();
+                        File fileToWrite = new File(filePathToWrite);
+                        Files.copy(file.toPath(), fileToWrite.toPath());
+                        System.exit(0);
+                    } catch (ClassNotFoundException cnfe) {
+                        System.err.println(cnfe.getMessage());
+                        cnfe.printStackTrace();
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    }
+               // }
 				
-				quit = ("EOF".equals(incomingMessage));//Apply the equals() to the not null string then. (or test if incoming is null)
+			//	quit = ("EOF".equals(incomingMessage));//Apply the equals() to the not null string then. (or test if incoming is null)
 
 
                 
 
-                /*if (incomingMessage.equals("EOF")) {
-                    quit = true;
-                }*/
 
-				//Display the received message:
-				//System.out.println("#" + String.format("%05d", this.id) + ":" + incomingMessage);
 
-				//Echo back the incoming message:
-			/*	if(incomingMessage != null)
-					this.dos.write(incomingMessage.getBytes());
-				else
-					this.dos.write("#empty message received#".getBytes());
-
-				this.dos.write('\r');//send LF(0xa): Line Feed
-				this.dos.write('\n');//send CR(0xd): Carriage Return
-				this.dos.flush();*/
 			} while (!quit);
 
             System.out.println("Bye Bye");
+
+            // Close all streams.
+            this.ois.close();
 			this.dos.close();
 			this.socket.close();
 

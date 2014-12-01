@@ -33,8 +33,8 @@ class Client {
 
         try {
             socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            dos = new DataOutputStream(socket.getOutputStream());
+            //dos = new DataOutputStream(socket.getOutputStream());
+            System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
@@ -42,22 +42,38 @@ class Client {
 
         String chaine = "";
         String filePath = args[0];
+
         File fileToSend = new File(filePath);
-
+//        dos.writeBytes("Prepare to write");
+ //       dos.flush();
         if (fileToSend.isFile()) {
-            dos.writeBytes("CREATE_FILE");
-            dos.flush();
-            sendFile(fileToSend);
-        }
+            if(oos == null) {
+                oos = new ObjectOutputStream(socket.getOutputStream());
+            }
+         //   oos.writeBytes("CREATE_FILE");
+         //   oos.flush();
+            // Send object file to the server.
+            oos.writeObject(fileToSend);
+            oos.flush();
+            //sendFile(fileToSend);
+            System.out.println("FILE SEND!!");
 
-        br.close();
-        dos.close();
+
+        }
+        //oos.writeBytes("EOF");
+        
+        //oos.flush();
+        //br.close();
+
+        // Close all streams.
+        oos.close();
+        //dos.close();
         socket.close();
     }
 
     public static void sendFile(File file) {
 
-        try { 
+        /*try { 
             InputStream ips = new FileInputStream(file);
             InputStreamReader ipr = new InputStreamReader(ips);
             BufferedReader breader = new BufferedReader(ipr);
@@ -77,7 +93,7 @@ class Client {
             System.err.println(ioe.getMessage());
             ioe.getStackTrace();
         }
-        System.out.println("File uploaded!!");
+        System.out.println("File uploaded!!");*/
 
     }
 }
