@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable {
 		this.dos = new DataOutputStream(socket.getOutputStream());
 		this.socket = socket;
 		this.id  = this.socket.getPort();//This ID might not be unique!
-		this.sendWelcomeMessage();
+	//	this.sendWelcomeMessage();
 		System.out.println("++ #" + String.format("%05d", this.id));
 	}
 
@@ -38,24 +38,33 @@ public class ClientHandler implements Runnable {
 			boolean quit = false;
 			do {
 				incomingMessage = br.readLine();
-				incomingMessage = (incomingMessage != null) ? incomingMessage.trim() : "";//Because of the trim(), incomingMessage can be null after!
+
+                incomingMessage = (incomingMessage != null) ? incomingMessage.trim() : "";
 				
-				quit = (Global.END_CONNECTION.equals(incomingMessage));//Apply the equals() to the not null string then. (or test if incoming is null)
+				quit = ("EOF".equals(incomingMessage));//Apply the equals() to the not null string then. (or test if incoming is null)
+
+
+                
+
+                /*if (incomingMessage.equals("EOF")) {
+                    quit = true;
+                }*/
 
 				//Display the received message:
-				System.out.println("#" + String.format("%05d", this.id) + ":" + incomingMessage);
+				//System.out.println("#" + String.format("%05d", this.id) + ":" + incomingMessage);
 
 				//Echo back the incoming message:
-				if(incomingMessage != null)
+			/*	if(incomingMessage != null)
 					this.dos.write(incomingMessage.getBytes());
 				else
 					this.dos.write("#empty message received#".getBytes());
 
 				this.dos.write('\r');//send LF(0xa): Line Feed
 				this.dos.write('\n');//send CR(0xd): Carriage Return
-				this.dos.flush();
+				this.dos.flush();*/
 			} while (!quit);
 
+            System.out.println("Bye Bye");
 			this.dos.close();
 			this.socket.close();
 
