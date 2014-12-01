@@ -8,7 +8,8 @@ import util.Global;
 class Client {
 
 	public static void main(String args[]) throws IOException {
-		int port = (args.length < 1) ? Global.DEFAULT_PORT : Integer.parseInt(args[0]);
+		//int port = (args.length < 1) ? Global.DEFAULT_PORT : Integer.parseInt(args[0]);
+        int port = 1234;
 		
 		// SEND INFO
 		Socket soc = null;
@@ -27,7 +28,7 @@ class Client {
 
 		String chaine = "";
 	    // READ FILE	
-		String filePath = args[1];
+		String filePath = args[0];
         System.out.println(filePath);
 		File fileToSend = new File(filePath);
 		if (fileToSend.isFile()) {
@@ -42,6 +43,9 @@ class Client {
                 dos.flush();
 			}
 			breader.close();
+            ips.close();
+            ipr.close();
+
 		}
         
 
