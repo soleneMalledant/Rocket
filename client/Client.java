@@ -22,6 +22,7 @@ class Client {
 
         if (args.length == 0) {
             usage();
+            System.exit(1);
         }
 
         // SEND INFO
@@ -29,18 +30,17 @@ class Client {
         BufferedReader br = null;
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         ObjectOutputStream oos = null; 
-
+        DataInputStream dis = null;
 
         try {
             socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
-            //dos = new DataOutputStream(socket.getOutputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
             System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
 
-        String chaine = "";
         String filePath = args[0];
 
         File fileToSend = new File(filePath);
@@ -50,9 +50,12 @@ class Client {
             if(oos == null) {
                 oos = new ObjectOutputStream(socket.getOutputStream());
             }
-         //   oos.writeBytes("CREATE_FILE");
-         //   oos.flush();
+
+            oos.writeObject("RECEIVE_FILE");
+            oos.flush();
+            
             // Send object file to the server.
+        
             oos.writeObject(fileToSend);
             oos.flush();
             //sendFile(fileToSend);
