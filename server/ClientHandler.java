@@ -45,17 +45,12 @@ public class ClientHandler implements Runnable {
             boolean quit = false;
 
             do {
-                //incomingMessage = br.readLine();
-                
+
                 try {
                     incomingMessage = (String) ois.readObject();
                 } catch (Exception e) {
                     System.err.println(e);
                 }
-
-               // incomingMessage = (incomingMessage != null) ? incomingMessage.trim() : "";
-
-                //System.out.println(incomingMessage);
 
 
                 if("RECEIVE_FILE".equals(incomingMessage)) {
@@ -77,14 +72,11 @@ public class ClientHandler implements Runnable {
                         System.exit(0);
 
                     }
-                    // }
 
-                    //	quit = ("EOF".equals(incomingMessage));//Apply the equals() to the not null string then. (or test if incoming is null)
-
-            }
+                }
 
 
-        } while (!quit);
+            } while (!quit);
 
             System.out.println("Bye Bye");
 
@@ -94,9 +86,9 @@ public class ClientHandler implements Runnable {
             this.socket.close();
 
             System.out.println("-- #" + String.format("%05d", this.id));
-    } catch (IOException e) {
-        System.err.println("Error occurred:" + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error occurred:" + e.getMessage());
+        }
     }
-}
 
 }
