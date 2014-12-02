@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.File;
@@ -17,6 +18,7 @@ public class ClientHandler implements Runnable {
     private DataOutputStream dos = null;
     private Socket socket = null;
     private ObjectInputStream ois = null;
+    private ObjectOutputStream oos = null;
     private int id = 0;//Remote port, two different clients could have the same though!
 
     public ClientHandler(Socket socket) throws IOException {
@@ -42,18 +44,22 @@ public class ClientHandler implements Runnable {
         try {
             System.out.println("try");
             String incomingMessage = null;
+            String[] message = null;
             boolean quit = false;
 
             do {
 
                 try {
                     incomingMessage = (String) ois.readObject();
+                    message = incomingMessage.split("@@");
                 } catch (Exception e) {
                     System.err.println(e);
                 }
 
 
-                if("RECEIVE_FILE".equals(incomingMessage)) {
+
+
+                if("RECEIVE_FILE@@".equals(incomingMessage)) {
                     try {
                         if (ois == null) {
                             ois = new ObjectInputStream(socket.getInputStream());
@@ -62,7 +68,7 @@ public class ClientHandler implements Runnable {
                         String filePathToWrite = Global.SERVER_REPOSITORY + "/" + file.getName();
                         File fileToWrite = new File(filePathToWrite);
                         Files.copy(file.toPath(), fileToWrite.toPath());
-                        System.exit(0);
+                        quit = true;
                     } catch (ClassNotFoundException cnfe) {
                         System.err.println(cnfe.getMessage());
                         cnfe.printStackTrace();
@@ -73,6 +79,16 @@ public class ClientHandler implements Runnable {
 
                     }
 
+                } else if ("SEND_FILE".equals(message[0])) {
+                    File fileToSend = new File(Global.SERVER_REPOSITORY + "/" + message[1]);
+                    if(oos == null) {
+                        oos = new ObjectOutputStream(socket.getOutputStream());
+                    }
+                    oos.writeObject(fileToSend);
+                    oos.flush();
+
+                    quit = true; 
+
                 }
 
 
@@ -81,8 +97,13 @@ public class ClientHandler implements Runnable {
             System.out.println("Bye Bye");
 
             // Close all streams.
-            this.ois.close();
-            this.dos.close();
+
+            if(ois != null) {
+                this.ois.close();
+            }
+            if (oos != null) {
+                this.oos.close();
+            }
             this.socket.close();
 
             System.out.println("-- #" + String.format("%05d", this.id));
