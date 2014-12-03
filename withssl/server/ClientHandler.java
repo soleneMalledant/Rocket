@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.File;
 import java.nio.file.Files;
+import javax.net.ssl.SSLSocket;
 
 import util.Global;
 
@@ -16,17 +17,15 @@ import util.Global;
 public class ClientHandler implements Runnable {
     private BufferedReader br = null;
     private DataOutputStream dos = null;
-    private Socket socket = null;
+    private SSLSocket sslSocket = null;
     private ObjectInputStream ois = null;
     private ObjectOutputStream oos = null;
     private int id = 0;//Remote port, two different clients could have the same though!
 
-    public ClientHandler(Socket socket) throws IOException {
-        this.br = new BufferedReader(new InputStreamReader(socket.getInputStream()));;
-        this.dos = new DataOutputStream(socket.getOutputStream());
-        this.socket = socket;
-        this.id  = this.socket.getPort();//This ID might not be unique!
-        this.ois = new ObjectInputStream(socket.getInputStream());
+    public ClientHandler(SSLSocket sslSocket) throws IOException {
+        this.sslSocket = sslSocket;
+        this.id  = this.sslSocket.getPort();//This ID might not be unique!
+        this.ois = new ObjectInputStream(sslSocket.getInputStream());
         //	this.sendWelcomeMessage();
         System.out.println("++ #" + String.format("%05d", this.id));
     }
@@ -60,7 +59,7 @@ public class ClientHandler implements Runnable {
                 if("RECEIVE_FILE@@".equals(incomingMessage)) {
                     try {
                         if (ois == null) {
-                            ois = new ObjectInputStream(socket.getInputStream());
+                            ois = new ObjectInputStream(sslSocket.getInputStream());
                         }
                         File file = (File) ois.readObject();
                         String filePathToWrite = Global.SERVER_REPOSITORY + "/" + file.getName();
@@ -81,7 +80,7 @@ public class ClientHandler implements Runnable {
                 } else if ("SEND_FILE".equals(message[0])) {
                     File fileToSend = new File(Global.SERVER_REPOSITORY + "/" + message[1]);
                     if(oos == null) {
-                        oos = new ObjectOutputStream(socket.getOutputStream());
+                        oos = new ObjectOutputStream(sslSocket.getOutputStream());
                     }
                     oos.writeObject(fileToSend);
                     oos.flush();
@@ -102,7 +101,7 @@ public class ClientHandler implements Runnable {
             if (oos != null) {
                 this.oos.close();
             }
-            this.socket.close();
+            this.sslSocket.close();
 
             System.out.println("-- #" + String.format("%05d", this.id));
         } catch (IOException e) {

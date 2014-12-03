@@ -5,6 +5,8 @@ import java.io.*;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import util.Global;
 
@@ -43,10 +45,17 @@ class Client {
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         ObjectOutputStream oos = null; 
         ObjectInputStream ois = null;
+        SSLSocket sslsocket = null;
+        SSLSocketFactory sslsocketfactory = null;
 
 
         try {
-            socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
+            sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            sslsocket = (SSLSocket) sslsocketfactory.createSocket(InetAddress.getLocalHost(), Global.RANDOM_PORT);
+
+
+
+           // socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
             dos = new DataOutputStream(socket.getOutputStream());
             System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
@@ -77,13 +86,13 @@ class Client {
 
         } else if (option.equals("download")) {
             if(oos == null) {
-                oos = new ObjectOutputStream(socket.getOutputStream());
+                oos = new ObjectOutputStream(sslsocket.getOutputStream());
             }
             System.out.println("debug: downloading file");
             oos.writeObject("SEND_FILE@@" + args[1]);
             oos.flush();
             if (ois == null)  {
-                ois =  new ObjectInputStream(socket.getInputStream()); 
+                ois =  new ObjectInputStream(sslsocket.getInputStream()); 
             }
             try {
                 File file = (File) ois.readObject();
@@ -104,7 +113,7 @@ class Client {
             oos.close();
         }
 
-        socket.close();
+        sslsocket.close();
 
     }     
 

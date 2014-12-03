@@ -2,7 +2,9 @@ package server;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
 
 import util.Global;
 
@@ -23,14 +25,17 @@ class Server {
 		int maxAcceptedClients = (args.length < 2) ? Global.MAX_ACCEPTED_CLIENTS : Integer.parseInt(args[1]);
 		maxAcceptedClients = (maxAcceptedClients < 100) ? maxAcceptedClients : 99;
 
-		ServerSocket ss = null;
+		//ServerSocket ss = null;
+        SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+        SSLServerSocket sslServerSocket = null;
 		//Listening on a port:
 		try {
-			ss = new ServerSocket(port);
-		} catch (IOException ioe) {
-			System.out.println("Error finding port");
+			//ss = new ServerSocket(port);
+            sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
 			System.exit(1);
-		}
+		} 
 
 		System.out.println("################################");
 		System.out.println("#      Listening on " + String.format("%05d", port) + "      #");
@@ -41,7 +46,7 @@ class Server {
 		try {
 
 			do {
-				new Thread(new ClientHandler(ss.accept())).start();
+				new Thread(new ClientHandler((SSLSocket) sslServerSocket.accept())).start();
 				acceptedClients++;
 			}while(acceptedClients < maxAcceptedClients);
 
