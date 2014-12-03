@@ -40,9 +40,7 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("BEGIN OF RUN");
         try {
-            System.out.println("try");
             String incomingMessage = null;
             String[] message = null;
             boolean quit = false;
@@ -69,6 +67,7 @@ public class ClientHandler implements Runnable {
                         File fileToWrite = new File(filePathToWrite);
                         Files.copy(file.toPath(), fileToWrite.toPath());
                         quit = true;
+                        System.out.println("File receive!");
                     } catch (ClassNotFoundException cnfe) {
                         System.err.println(cnfe.getMessage());
                         cnfe.printStackTrace();
@@ -86,9 +85,8 @@ public class ClientHandler implements Runnable {
                     }
                     oos.writeObject(fileToSend);
                     oos.flush();
-
                     quit = true; 
-
+                    System.out.println("File send to client");
                 }
 
 
