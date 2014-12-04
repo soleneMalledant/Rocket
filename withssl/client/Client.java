@@ -44,19 +44,12 @@ class Client {
 
         try {
             sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            //sslsocket = (SSLSocket) sslsocketfactory.createSocket(InetAddress.getLocalHost(), Global.RANDOM_PORT);
             sslsocket = (SSLSocket) sslsocketfactory.createSocket("localhost", 1234);
-
-
-
-           // socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
             System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
         }
-
-
 
         if(option.equals("upload")) {
 
@@ -108,11 +101,4 @@ class Client {
         sslsocket.close();
 
     }     
-
-
-
 }
-
-
-
-
