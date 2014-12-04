@@ -1,17 +1,17 @@
 package client;
 
-import java.net.*;
-import java.io.*;
-import java.io.ObjectOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.file.Files;
 
 import util.Global;
 
 class Client {
 
-    private BufferedReader br = null;
-    private static DataOutputStream dos = null;
     private Socket socket = null;
 
     public static void usage() {
@@ -35,19 +35,14 @@ class Client {
         //int port = (args.length < 1) ? Global.DEFAULT_PORT : Integer.parseInt(args[0]);
         int port = Global.DEFAULT_PORT;
 
-
-
         // SEND INFO
         Socket socket = null;
-        BufferedReader br = null;
-        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         ObjectOutputStream oos = null; 
         ObjectInputStream ois = null;
 
 
         try {
             socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
-            dos = new DataOutputStream(socket.getOutputStream());
             System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -107,8 +102,6 @@ class Client {
         socket.close();
 
     }     
-
-
 
 
 }

@@ -17,8 +17,6 @@ class Server {
 		repository.mkdirs();
 		
 		
-		
-		
 		int port = (args.length < 1) ? Global.DEFAULT_PORT : Integer.parseInt(args[0]);
 		int maxAcceptedClients = (args.length < 2) ? Global.MAX_ACCEPTED_CLIENTS : Integer.parseInt(args[1]);
 		maxAcceptedClients = (maxAcceptedClients < 100) ? maxAcceptedClients : 99;
@@ -33,13 +31,13 @@ class Server {
 		}
 
 		System.out.println("################################");
+        System.out.println("###        ROCKET server     ###");
 		System.out.println("#      Listening on " + String.format("%05d", port) + "      #");
 		System.out.println("# Waiting for clients (" + String.format("%02d", maxAcceptedClients) + " max) #");
 		System.out.println("################################");
 
 		int acceptedClients = 0;
 		try {
-
 			do {
 				new Thread(new ClientHandler(ss.accept())).start();
 				acceptedClients++;

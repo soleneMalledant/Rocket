@@ -1,41 +1,26 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.io.ObjectInputStream;
-import java.io.File;
 import java.nio.file.Files;
 
 import util.Global;
 
 
 public class ClientHandler implements Runnable {
-    private BufferedReader br = null;
-    private DataOutputStream dos = null;
     private Socket socket = null;
     private ObjectInputStream ois = null;
     private ObjectOutputStream oos = null;
     private int id = 0;//Remote port, two different clients could have the same though!
 
     public ClientHandler(Socket socket) throws IOException {
-        this.br = new BufferedReader(new InputStreamReader(socket.getInputStream()));;
-        this.dos = new DataOutputStream(socket.getOutputStream());
         this.socket = socket;
         this.id  = this.socket.getPort();//This ID might not be unique!
         this.ois = new ObjectInputStream(socket.getInputStream());
-        //	this.sendWelcomeMessage();
         System.out.println("++ #" + String.format("%05d", this.id));
-    }
-
-    private void sendWelcomeMessage() throws IOException {
-        this.dos.write(new String("Write \"" + Global.END_CONNECTION + "\" to disconnect").getBytes());
-        this.dos.write('\r');//send LF(0xa): Line Feed
-        this.dos.write('\n');//send CR(0xd): Carriage Return
-        this.dos.flush();
     }
 
     @Override
@@ -53,9 +38,6 @@ public class ClientHandler implements Runnable {
                 } catch (Exception e) {
                     System.err.println(e);
                 }
-
-
-
 
                 if("RECEIVE_FILE@@".equals(incomingMessage)) {
                     try {
@@ -89,13 +71,11 @@ public class ClientHandler implements Runnable {
                     System.out.println("File send to client");
                 }
 
-
             } while (!quit);
 
             System.out.println("Bye Bye");
 
             // Close all streams.
-
             if(ois != null) {
                 this.ois.close();
             }
