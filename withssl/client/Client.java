@@ -1,20 +1,16 @@
 package client;
 
-import java.net.*;
-import java.io.*;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
+import java.io.File;
+import java.io.IOException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import util.Global;
 
 class Client {
-
-    private BufferedReader br = null;
-    private static DataOutputStream dos = null;
-    private Socket socket = null;
 
     public static void usage() {
         System.out.println("Usage: Client COMMAND <filename>");
@@ -40,9 +36,6 @@ class Client {
 
 
         // SEND INFO
-        Socket socket = null;
-        BufferedReader br = null;
-        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         ObjectOutputStream oos = null; 
         ObjectInputStream ois = null;
         SSLSocket sslsocket = null;
@@ -51,12 +44,12 @@ class Client {
 
         try {
             sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            sslsocket = (SSLSocket) sslsocketfactory.createSocket(InetAddress.getLocalHost(), Global.RANDOM_PORT);
+            //sslsocket = (SSLSocket) sslsocketfactory.createSocket(InetAddress.getLocalHost(), Global.RANDOM_PORT);
+            sslsocket = (SSLSocket) sslsocketfactory.createSocket("localhost", 1234);
 
 
 
            // socket = new Socket(InetAddress.getLocalHost(), port, InetAddress.getLocalHost(), Global.RANDOM_PORT);
-            dos = new DataOutputStream(socket.getOutputStream());
             System.out.println("CONNECTION ESTABLISHED...");
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -67,12 +60,11 @@ class Client {
 
         if(option.equals("upload")) {
 
-
             String filePath = args[1];
             File fileToSend = new File(filePath);
             if (fileToSend.isFile()) {
                 if(oos == null) {
-                    oos = new ObjectOutputStream(socket.getOutputStream());
+                    oos = new ObjectOutputStream(sslsocket.getOutputStream());
                 }
 
                 oos.writeObject("RECEIVE_FILE@@");
@@ -116,7 +108,6 @@ class Client {
         sslsocket.close();
 
     }     
-
 
 
 
