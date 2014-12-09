@@ -3,7 +3,7 @@ Rocket
 Network Student Project
 -----------------------
 
-Rocket is a simple file sharing client/server software. Rocket is a student project focused on network mechanism. So, some behaviors can be unexpected.
+Rocket is a simple file sharing client/server software. Rocket is a student project focused on network mechanisms. So, some behaviors can be unexpected.
 
 
 #How to use it?
