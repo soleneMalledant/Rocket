@@ -7,18 +7,31 @@ Rocket is a simple file sharing client/server software. Rocket is a student proj
 
 
 #How to use it?
+Clone the git:
+```git clone https://github.com/soleneMalledant/Rocket```
+
+```cd Rocket``` then
+
+```cd wihtssl``` OR ```cd withoutssl```
+
+Compile the server and the client
+```javac server/Server.java```
+```javac client/Client.java```
+
+
+
 ##Launch the server:
 
-```java server```
+```java server.Server```
 
 
 ##To upload a file
 
-```java client upload <filename>```
+```java client.Client upload <filename>```
 
 
 ##To download a file
 
-```java client download <filename>```
+```java client.Client download <filename>```
 
 
