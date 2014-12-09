@@ -5,7 +5,8 @@ Network Student Project
 
 Rocket is a simple file sharing client/server software.
 
-#To use it:
+
+#How to use it ?
 ##Launch the server:
 
 ```java server```
